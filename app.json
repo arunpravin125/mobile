@@ -7,6 +7,9 @@
     "icon": "./assets/images/icon.png",
     "scheme": "mobile",
     "userInterfaceStyle": "automatic",
+    "web": {
+      "bundler": "metro"
+    },
     "ios": {
       "icon": "./assets/expo.icon"
     },
@@ -17,7 +20,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.arunpravin125.mobile"
     },
     "web": {
       "output": "static",
