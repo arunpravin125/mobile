@@ -1,7 +1,9 @@
 import { useAuth, useOAuth } from "@clerk/expo";
 import axios, { AxiosInstance } from "axios";
 
-const API_BASE_URL = "https://twitter-03-09-2026.vercel.app/api";
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  "https://twitter-03-09-2026.vercel.app/api";
 
 export const createApiClient = (
   getToken: () => Promise<string | null>,
