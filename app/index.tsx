@@ -1,23 +1,13 @@
-import { useAuth, useClerk } from '@clerk/expo'
-import { Redirect } from 'expo-router'
-import { Button, Text, View } from 'react-native'
+import { useAuth } from '@clerk/expo'
+import { Redirect, type Href } from 'expo-router'
 
 export default function HomeScreen() {
     const { isLoaded, isSignedIn } = useAuth()
-    const { signOut } = useClerk()
-
     if (!isLoaded) {
         return null
     }
 
-    if (!isSignedIn) {
-        return <Redirect href="/(auth)" />
-    }
+    const destination: Href = isSignedIn ? ('/(tabs)' as Href) : '/(auth)/sign-in'
 
-    return (
-        <View className="flex-1 items-center justify-center">
-            <Text>HomeScreen</Text>
-            <Button onPress={() => signOut()} title="logout" ></Button>
-        </View>
-    )
+    return <Redirect href={destination} />
 }
