@@ -5,27 +5,8 @@ import { useUser } from '@clerk/expo'
 import { Feather } from '@expo/vector-icons'
 
 const PostComponents = () => {
-
-
     const { content, setContent, selectedImage, isCreating, pickImageFromGallery, takePhoto, removeImage, createPost } = useCreatePost()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     const { user } = useUser()
-
-
-
 
     return (
         <View className='border-b border-gray-100 p-4 bg-white'>

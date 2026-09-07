@@ -4,6 +4,7 @@ import SignOutButton from '../../components/SignOutButton'
 import { useUserSync } from '../../hooks/useUserSync'
 import { Feather, Ionicons } from '@expo/vector-icons'
 import PostComponents from '../../components/PostComponents'
+import PostsList from '../../components/PostsList'
 
 export default function HomeTab() {
     useUserSync()
@@ -17,7 +18,7 @@ export default function HomeTab() {
             </View>
             <ScrollView showsVerticalScrollIndicator={false} className='flex-1' contentContainerStyle={{ paddingBottom: 80 }} >
                 <PostComponents />
-
+                <PostsList />
             </ScrollView>
         </SafeAreaView>
     )
