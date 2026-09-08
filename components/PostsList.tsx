@@ -1,13 +1,16 @@
 import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { usePosts } from '../hooks/usePosts'
 import { Post } from '../types'
 import PostCard from './PostCard'
+import CommentsModal from './CommentsModal'
 
 const PostsList = () => {
     const { currentUser, } = useCurrentUser()
     const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts()
+    const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
+    const selectedPost = selectedPostId ? posts.find((p: Post) => p._id === selectedPostId) : null
     console.log("currentUser:", currentUser)
     console.log("posts", posts)
 
@@ -42,9 +45,13 @@ const PostsList = () => {
     return (
         <>
             {posts.map((post: Post) => {
-                return <PostCard key={post._id} post={post} onLike={toggleLike} onDelete={deletePost} currentUser={currentUser} isLiked={checkIsLiked(post.likes, currentUser)} />
+                return <PostCard key={post._id} post={post} onLike={toggleLike} onDelete={deletePost} currentUser={currentUser}
+                    isLiked={checkIsLiked(post.likes, currentUser)}
+                    onComment={setSelectedPostId}
+
+                />
             })}
-            <Text>PostsList</Text>
+            <CommentsModal selectedPost={selectedPost} onClose={() => setSelectedPostId(null)} />
         </>
     )
 }

@@ -3,6 +3,7 @@ import { tokenCache } from '@clerk/expo/token-cache'
 import { Stack } from 'expo-router'
 import '../global.css'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { StatusBar } from 'expo-status-bar'
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!
 
@@ -21,6 +22,7 @@ export default function RootLayout() {
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(tabs)" />
         </Stack>
+        <StatusBar style="dark" />
       </QueryClientProvider>
     </ClerkProvider>
   )
