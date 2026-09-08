@@ -7,6 +7,8 @@ import { format } from 'date-fns'
 import { usePosts } from '../../hooks/usePosts'
 import PostsList from '../../components/PostsList'
 import { useState } from 'react'
+import { useProfile } from '../../hooks/useProfile'
+import EditProfileModal from '../../components/EditProfileModal'
 
 export default function ProfileScreen() {
     const { currentUser, isLoading } = useCurrentUser()
@@ -14,8 +16,9 @@ export default function ProfileScreen() {
     //  const [isRefetching,setIsRefetching] = useState(false)
     const { posts: userPosts, refetch: RefetchPosts, isLoading: isRefetching } = usePosts(currentUser?.username)
 
+    const { isEditModalVisible, openEditModal, closeEditModal, formData, saveProfile, updateFormField, isUpdating, refetch: refetchProfile } = useProfile()
 
-    if (isRefetching) {
+    if (isRefetching || isLoading) {
         return (
             <View className='flex-1 bg-white items-center justify-center'>
                 <ActivityIndicator size="large" color={"#1DA1f2"} />
@@ -29,9 +32,12 @@ export default function ProfileScreen() {
     }
 
     return (
-        <ScrollView refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handlePullToRefresh} tintColor={"#1da1f2"} />}>
+        <ScrollView refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => {
+            refetchProfile()
+            RefetchPosts()
+        }} tintColor={"#1da1f2"} />}>
 
-            <SafeAreaView className="flex-1 bg-white">
+            <SafeAreaView edges={["top"]} className="flex-1 bg-white">
                 {/* header */}
                 <View className='flex-row items-center justify-between px-4 py-3 border-b  border-gray-100' >
                     <View>
@@ -41,7 +47,10 @@ export default function ProfileScreen() {
                     <SignOutButton />
                 </View>
 
-                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 + inserts.bottom }} className='flex-1'>
+                <ScrollView refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => {
+                    refetchProfile(),
+                        RefetchPosts()
+                }} tintColor={"#1da1f2"} />} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 + inserts.bottom }} className='flex-1'>
 
                     <View className='relative' >
                         <Image resizeMode='cover' className='w-full h-48' source={{ uri: currentUser.bannerImage || "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop" }} />
@@ -51,7 +60,7 @@ export default function ProfileScreen() {
                         <View className='flex-row justify-between items-end -mt-16 mb-4' >
                             <Image source={{ uri: currentUser.profilePicture }} className='w-32 h-32 rounded-full border-4 border-white' />
 
-                            <TouchableOpacity className='border border-gray-300 px-6 py-2 rounded-full'>
+                            <TouchableOpacity onPress={openEditModal} className='border border-gray-300 px-6 py-2 rounded-full'>
                                 <Text className='font-semibold text-gray-900'>Edit profile</Text>
                             </TouchableOpacity>
                         </View>
@@ -93,6 +102,14 @@ export default function ProfileScreen() {
                     <PostsList username={currentUser?.username} />
 
                 </ScrollView>
+                <EditProfileModal isVisible={isEditModalVisible}
+                    onClose={closeEditModal}
+                    formData={formData}
+                    saveProfile={saveProfile}
+                    updateFormField={updateFormField}
+                    isUpdating={isUpdating}
+
+                />
 
             </SafeAreaView>
         </ScrollView>

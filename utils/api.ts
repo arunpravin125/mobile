@@ -32,7 +32,7 @@ export const userApi = {
   syncUser: (api: AxiosInstance) => api.post("/users/sync"),
   getCurrentUser: (api: AxiosInstance) => api.get("/users/me"),
   updateProfile: (api: AxiosInstance, data: any) =>
-    api.put("/users/profile", data),
+    api.post("/users/profile", data),
 };
 
 export const postApi = {
