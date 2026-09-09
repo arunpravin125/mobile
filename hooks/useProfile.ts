@@ -14,6 +14,8 @@ export const useProfile = () => {
     lastName: "",
     bio: "",
     location: "",
+    profilePicture: "",
+    bannerImage: "",
   });
 
   const { currentUser, refetch } = useCurrentUser();
@@ -40,6 +42,8 @@ export const useProfile = () => {
         lastName: currentUser.lastName || "",
         bio: currentUser.bio || "",
         location: currentUser.location || "",
+        profilePicture: currentUser.profilePicture || "",
+        bannerImage: currentUser.bannerImage || "",
       });
     }
 
@@ -55,7 +59,24 @@ export const useProfile = () => {
   };
 
   const saveProfile = () => {
-    updateProfileMutation.mutate(formData);
+    const payload = new FormData();
+    payload.append("firstName", formData.firstName);
+    payload.append("lastName", formData.lastName);
+    payload.append("bio", formData.bio);
+    payload.append("location", formData.location);
+
+    for (const field of ["profilePicture", "bannerImage"] as const) {
+      const uri = formData[field];
+      if (!uri || uri.startsWith("http")) continue;
+      const extension = uri.split(".").pop()?.toLowerCase() || "jpg";
+      payload.append(field, {
+        uri,
+        name: `${field}.${extension}`,
+        type: extension === "png" ? "image/png" : "image/jpeg",
+      } as any);
+    }
+
+    updateProfileMutation.mutate(payload);
   };
 
   return {

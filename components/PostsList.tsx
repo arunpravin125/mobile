@@ -1,15 +1,17 @@
 import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { useCurrentUser } from '../hooks/useCurrentUser'
-import { usePosts } from '../hooks/usePosts'
+import { ProfileTimeline, usePosts } from '../hooks/usePosts'
 import { Post } from '../types'
 import PostCard from './PostCard'
 import CommentsModal from './CommentsModal'
+import { useRepost } from '../hooks/useRepost'
 
-const PostsList = ({ username }: { username?: string }) => {
+const PostsList = ({ username, timeline = 'posts' }: { username?: string; timeline?: ProfileTimeline }) => {
     const { currentUser, } = useCurrentUser()
-    const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts(username)
+    const { posts, isLoading, error, refetch, toggleLike, deletePost, checkIsLiked } = usePosts(username, timeline)
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
+    const { repost } = useRepost()
     const selectedPost = selectedPostId ? posts.find((p: Post) => p._id === selectedPostId) : null
     console.log("currentUser:", currentUser)
     console.log("posts", posts)
@@ -45,8 +47,14 @@ const PostsList = ({ username }: { username?: string }) => {
     return (
         <>
             {posts.map((post: Post) => {
-                return <PostCard key={post._id} post={post} onLike={toggleLike} onDelete={deletePost} currentUser={currentUser}
+                const isReposted = posts.some((candidate: Post) =>
+                    candidate.user?._id === currentUser?._id &&
+                    candidate.repostedPost?._id === post._id
+                )
+
+                return <PostCard key={post._id} post={post} onLike={toggleLike} onDelete={deletePost} onRepost={repost} currentUser={currentUser}
                     isLiked={checkIsLiked(post.likes, currentUser)}
+                    isReposted={isReposted}
                     onComment={setSelectedPostId}
 
                 />

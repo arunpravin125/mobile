@@ -3,6 +3,7 @@ import React from 'react'
 import { Notification } from '../types'
 import { Feather } from '@expo/vector-icons'
 import { formatDate } from '../utils/formatters'
+import { router } from 'expo-router'
 
 interface notificationCardProps {
     notification: Notification,
@@ -54,12 +55,12 @@ const NotificationCard = ({ notification, onDelete }: notificationCardProps) => 
     return (
         <View className='border-b border-gray-100 bg-white'>
             <View className='flex-row p-4'>
-                <View className='relative mr-3 '>
+                <TouchableOpacity className='relative mr-3' onPress={() => router.push({ pathname: '/profile/[username]', params: { username: notification.from.username } })}>
                     <Image source={{ uri: notification.from.profilePicture }} className='size-12 rounded-full' />
                     <View className='absolute -bottom-1 -right-1 size-6 bg-white items-center justify-center '>
                         {getNotificationIcon()}
                     </View>
-                </View>
+                </TouchableOpacity>
 
                 <View className='flex-1' >
                     <View className='flex-row items-start justify-between mb-1' >

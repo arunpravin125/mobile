@@ -4,6 +4,7 @@ import { Stack } from 'expo-router'
 import '../global.css'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { StatusBar } from 'expo-status-bar'
+import { ThemeProvider, useTheme } from '../context/ThemeContext'
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!
 
@@ -17,14 +18,25 @@ export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <QueryClientProvider client={queryClient}>
-
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(tabs)" />
-        </Stack>
-        <StatusBar style="dark" />
+        <ThemeProvider>
+          <AppNavigator />
+        </ThemeProvider>
       </QueryClientProvider>
     </ClerkProvider>
+  )
+}
+
+function AppNavigator() {
+  const { theme } = useTheme()
+
+  return (
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
+      </Stack>
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
+    </>
   )
 }
 // import { Stack } from "expo-router";

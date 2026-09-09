@@ -21,11 +21,29 @@ export const useComment = () => {
     },
     onSuccess: () => {
       setCommentText("");
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries();
     },
     onError: () => {
       Alert.alert("Error", "Failed to post comment. Try again");
     },
+  });
+
+  const updateCommentMutation = useMutation({
+    mutationFn: ({
+      commentId,
+      content,
+    }: {
+      commentId: string;
+      content: string;
+    }) => commentApi.updateComment(api, commentId, content),
+    onSuccess: () => queryClient.invalidateQueries(),
+    onError: () => Alert.alert("Error", "Failed to update comment. Try again"),
+  });
+
+  const deleteCommentMutation = useMutation({
+    mutationFn: (commentId: string) => commentApi.deleteComment(api, commentId),
+    onSuccess: () => queryClient.invalidateQueries(),
+    onError: () => Alert.alert("Error", "Failed to delete comment. Try again"),
   });
 
   const createComment = (postId: string) => {
@@ -43,5 +61,11 @@ export const useComment = () => {
     createCommentMutation,
     createComment,
     isCreatingComment: createCommentMutation.isPending,
+    updateComment: (commentId: string, content: string) =>
+      updateCommentMutation.mutate({ commentId, content }),
+    deleteComment: (commentId: string) =>
+      deleteCommentMutation.mutate(commentId),
+    isUpdatingComment: updateCommentMutation.isPending,
+    isDeletingComment: deleteCommentMutation.isPending,
   };
 };

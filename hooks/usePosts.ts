@@ -1,7 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApiClient, postApi } from "../utils/api";
+import { Post } from "../types";
 
-export const usePosts = (username?: string) => {
+export type ProfileTimeline = "posts" | "replies" | "reposts";
+
+export const usePosts = (
+  username?: string,
+  timeline: ProfileTimeline = "posts",
+) => {
   const api = useApiClient();
 
   const queryClient = useQueryClient();
@@ -12,10 +18,35 @@ export const usePosts = (username?: string) => {
     error,
     refetch,
   } = useQuery({
-    queryKey: username ? ["userPosts", username] : ["posts"],
+    queryKey: username ? ["userPosts", username, timeline] : ["posts"],
     queryFn: () =>
-      username ? postApi.getUserPosts(api, username) : postApi.getPosts(api),
-    select: (response) => response.data.posts,
+      !username
+        ? postApi.getPosts(api)
+        : timeline === "replies"
+          ? postApi.getUserReplies(api, username)
+          : timeline === "reposts"
+            ? postApi.getUserReposts(api, username)
+            : postApi.getUserPosts(api, username),
+    select: (response) => {
+      const posts: Post[] = response.data.posts || [];
+      const repostCounts = posts.reduce(
+        (counts: Record<string, number>, post: Post) => {
+          const repostedPostId = post.repostedPost?._id;
+
+          if (repostedPostId) {
+            counts[repostedPostId] = (counts[repostedPostId] || 0) + 1;
+          }
+
+          return counts;
+        },
+        {},
+      );
+
+      return posts.map((post) => ({
+        ...post,
+        repostCount: post.repostCount ?? repostCounts[post._id] ?? 0,
+      }));
+    },
   });
 
   const likePostMutation = useMutation({

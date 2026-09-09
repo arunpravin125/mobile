@@ -4,6 +4,12 @@ export interface User {
   firstName: string;
   lastName: string;
   profilePicture?: string;
+  bannerImage?: string;
+  bio?: string;
+  location?: string;
+  followers?: string[];
+  following?: string[];
+  createdAt?: string;
 }
 
 export interface Comment {
@@ -17,10 +23,12 @@ export interface Post {
   _id: string;
   content: string;
   image?: string;
+  repostedPost?: Post;
   createdAt: string;
   user: User;
   likes: string[];
   comments: Comment[];
+  repostCount?: number;
 }
 
 export interface Notification {

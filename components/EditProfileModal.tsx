@@ -1,5 +1,6 @@
-import { View, Text, Modal, TouchableOpacity, ActivityIndicator, ScrollView, TextInput } from 'react-native'
+import { View, Text, Modal, TouchableOpacity, ActivityIndicator, ScrollView, TextInput, Image, Alert } from 'react-native'
 import React from 'react'
+import * as ImagePicker from 'expo-image-picker'
 
 interface EditProfileModalProps {
     isVisible: boolean,
@@ -8,7 +9,9 @@ interface EditProfileModalProps {
         firstName: string,
         lastName: string,
         bio: string,
-        location: string
+        location: string,
+        profilePicture: string,
+        bannerImage: string,
     };
     saveProfile: () => void
     updateFormField: (fields: string, value: string) => void;
@@ -16,6 +19,23 @@ interface EditProfileModalProps {
 }
 
 const EditProfileModal = ({ isVisible, onClose, formData, saveProfile, updateFormField, isUpdating }: EditProfileModalProps) => {
+
+    const pickImage = async (field: 'profilePicture' | 'bannerImage') => {
+        const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
+        if (permission.status !== 'granted') {
+            Alert.alert('Permission needed', 'Please allow photo library access to choose an image.')
+            return
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            aspect: field === 'bannerImage' ? [16, 9] : [1, 1],
+            quality: 0.8,
+        })
+
+        if (!result.canceled) updateFormField(field, result.assets[0].uri)
+    }
 
     const handleSave = () => {
         saveProfile()
@@ -40,6 +60,20 @@ const EditProfileModal = ({ isVisible, onClose, formData, saveProfile, updateFor
             </View>
             <ScrollView className='flex-1 px-4 py-6'>
                 <View className='space-y-4'>
+                    <View>
+                        <Text className='text-gray-500 text-sm mb-2'>Profile photo</Text>
+                        <TouchableOpacity onPress={() => pickImage('profilePicture')} className='items-center'>
+                            <Image source={{ uri: formData.profilePicture }} className='w-24 h-24 rounded-full' />
+                            <Text className='text-blue-500 mt-2'>Change profile photo</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View>
+                        <Text className='text-gray-500 text-sm mb-2'>Profile banner</Text>
+                        <TouchableOpacity onPress={() => pickImage('bannerImage')}>
+                            <Image source={{ uri: formData.bannerImage }} className='w-full h-32 rounded-lg' resizeMode='cover' />
+                            <Text className='text-blue-500 mt-2'>Change banner image</Text>
+                        </TouchableOpacity>
+                    </View>
                     <View>
                         <Text className='text-gray-500 text-sm mb-2'>First Name</Text>
                         <TextInput placeholder='Your first name' value={formData.firstName} onChangeText={(text) => updateFormField("firstName", text)} className='border border-gray-200 rounded-lg p-3 text-base' />

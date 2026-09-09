@@ -11,7 +11,13 @@ export const createApiClient = (
   const api = axios.create({ baseURL: API_BASE_URL });
 
   api.interceptors.request.use(async (config) => {
-    const token = await getToken();
+    let token: string | null = null;
+
+    try {
+      token = await getToken();
+    } catch {
+      // Public requests can continue without a Clerk token.
+    }
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -31,6 +37,14 @@ export const useApiClient = (): AxiosInstance => {
 export const userApi = {
   syncUser: (api: AxiosInstance) => api.post("/users/sync"),
   getCurrentUser: (api: AxiosInstance) => api.get("/users/me"),
+  searchUsers: (api: AxiosInstance, query: string) =>
+    api.get(`/users/search?q=${encodeURIComponent(query)}`),
+  getRelationshipUsers: (api: AxiosInstance, type: "followers" | "following") =>
+    api.get(`/users/relationships/${type}`),
+  getProfile: (api: AxiosInstance, username: string) =>
+    api.post(`/users/profile/${encodeURIComponent(username)}`),
+  toggleFollow: (api: AxiosInstance, userId: string) =>
+    api.post(`/users/follow/${userId}`),
   updateProfile: (api: AxiosInstance, data: any) =>
     api.post("/users/profile", data),
 };
@@ -41,8 +55,14 @@ export const postApi = {
   getPosts: (api: AxiosInstance) => api.get("/posts"),
   getUserPosts: (api: AxiosInstance, username: string) =>
     api.get(`/posts/user/${username}`),
+  getUserReplies: (api: AxiosInstance, username: string) =>
+    api.get(`/posts/user/${username}/replies`),
+  getUserReposts: (api: AxiosInstance, username: string) =>
+    api.get(`/posts/user/${username}/reposts`),
   likePost: (api: AxiosInstance, postId: string) =>
     api.post(`/posts/${postId}/like`),
+  repostPost: (api: AxiosInstance, postId: string, content = "") =>
+    api.post(`/posts/${postId}/repost`, { content }),
   deletePost: (api: AxiosInstance, postId: string) =>
     api.delete(`/posts/${postId}`),
 };
@@ -50,4 +70,8 @@ export const postApi = {
 export const commentApi = {
   createComment: (api: AxiosInstance, postId: string, content: string) =>
     api.post(`/comments/post/${postId}`, { content }),
+  updateComment: (api: AxiosInstance, commentId: string, content: string) =>
+    api.patch(`/comments/${commentId}`, { content }),
+  deleteComment: (api: AxiosInstance, commentId: string) =>
+    api.delete(`/comments/${commentId}`),
 };
