@@ -27,7 +27,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.arunpravin125.mobile"
+      "package": "com.arunpravin125.mobile",
+      "usesCleartextTraffic": true
     },
     "plugins": [
       "expo-router",
@@ -45,6 +46,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5bc51181-d059-4aa7-8e30-24de791b3c98"
+      }
     }
   }
 }
